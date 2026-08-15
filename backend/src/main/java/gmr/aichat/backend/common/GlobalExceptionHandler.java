@@ -1,5 +1,6 @@
 package gmr.aichat.backend.common;
 
+import gmr.aichat.backend.auth.exception.InvalidVerificationCodeException;
 import gmr.aichat.backend.auth.exception.VerificationCodeCooldownException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,25 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(error);
+    }
+
+    @ExceptionHandler(
+            InvalidVerificationCodeException.class
+    )
+    public ResponseEntity<ApiError>
+    handleInvalidVerificationCode(
+            InvalidVerificationCodeException exception
+    ) {
+
+        ApiError error = new ApiError(
+                HttpStatus.UNAUTHORIZED.value(),
+                exception.getMessage(),
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
                 .body(error);
     }
 }

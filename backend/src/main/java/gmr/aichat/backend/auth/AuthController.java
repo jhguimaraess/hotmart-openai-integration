@@ -1,6 +1,8 @@
 package gmr.aichat.backend.auth;
 
 import gmr.aichat.backend.auth.dto.RequestVerificationCodeRequest;
+import gmr.aichat.backend.auth.dto.TokenResponse;
+import gmr.aichat.backend.auth.dto.VerifyCodeRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +27,21 @@ public class AuthController {
         );
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<TokenResponse> verifyCode(
+            @RequestBody
+            @Valid
+            VerifyCodeRequest request
+    ) {
+
+        TokenResponse response =
+                authService.verifyCode(
+                        request.email(),
+                        request.code()
+                );
+
+        return ResponseEntity.ok(response);
     }
 }
