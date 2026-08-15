@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PurchaseService {
 
-    private PurchaseRepository purchaseRepository;
-    private UserService userService;
+    private final PurchaseRepository purchaseRepository;
+    private final UserService userService;
 
     public PurchaseService(PurchaseRepository purchaseRepository, UserService userService){
         this.purchaseRepository = purchaseRepository;
@@ -61,5 +62,24 @@ public class PurchaseService {
         purchase.setStatus(status);
 
         return purchase;
+    }
+
+    public boolean existsByTransactionId(String hotmartTransactionId){
+        return purchaseRepository
+                .existsByHotmartTransactionId(hotmartTransactionId);
+    }
+
+    public boolean hasApprovedPurchase(Long userId) {
+        return purchaseRepository.existsByUser_IdAndStatus(
+                userId,
+                PurchaseStatus.APPROVED
+        );
+    }
+
+    public Optional<Purchase> findOptionalByTransactionId(
+            String hotmartTransactionId
+    ) {
+        return purchaseRepository
+                .findByHotmartTransactionId(hotmartTransactionId);
     }
 }

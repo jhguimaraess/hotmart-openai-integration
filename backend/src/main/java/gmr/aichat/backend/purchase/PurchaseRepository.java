@@ -12,4 +12,9 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     boolean existsByHotmartTransactionId(String hotmartTransactionId);
 
     List<Purchase> findAllByUserId(Long userId);
+
+    boolean existsByUser_IdAndStatus(
+            Long userId,
+            PurchaseStatus status
+    );
 }
