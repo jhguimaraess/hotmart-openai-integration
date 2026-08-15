@@ -62,4 +62,9 @@ public class PurchaseService {
 
         return purchase;
     }
+
+    public boolean existsByTransactionId(String hotmartTransactionId){
+        return purchaseRepository
+                .existsByHotmartTransactionId(hotmartTransactionId);
+    }
 }
