@@ -1,6 +1,7 @@
 package gmr.aichat.backend.hotmart;
 
 import gmr.aichat.backend.hotmart.dto.HotmartWebhookRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class HotmartWebhookController {
                     value = "X-HOTMART-HOTTOK",
                     required = false
             ) String hottok,
-            @RequestBody HotmartWebhookRequest request){
+            @RequestBody @Valid HotmartWebhookRequest request){
 
         if(!expectedHottok.equals(hottok)){
             return ResponseEntity
