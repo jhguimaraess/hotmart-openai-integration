@@ -8,6 +8,14 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.util.HexFormat;
+
 @Service
 public class VerificationCodeService {
 
@@ -25,11 +33,17 @@ public class VerificationCodeService {
 
     private final StringRedisTemplate redisTemplate;
     private final SecureRandom secureRandom = new SecureRandom();
+    private final String verificationCodeSecret;
 
     public VerificationCodeService(
-            StringRedisTemplate redisTemplate
+            StringRedisTemplate redisTemplate,
+
+            @Value("${auth.verification-code-secret}")
+            String verificationCodeSecret
     ) {
         this.redisTemplate = redisTemplate;
+        this.verificationCodeSecret =
+                verificationCodeSecret;
     }
 
     public String generateAndStoreCode(String email) {
@@ -57,11 +71,14 @@ public class VerificationCodeService {
 
         String code = generateCode();
 
+        String codeHash =
+                hashCode(normalizedEmail, code);
+
         redisTemplate
                 .opsForValue()
                 .set(
                         codeKey,
-                        code,
+                        codeHash,
                         CODE_TTL
                 );
 
@@ -78,10 +95,13 @@ public class VerificationCodeService {
         String codeKey =
                 CODE_KEY_PREFIX + normalizedEmail;
 
+        String codeHash =
+                hashCode(normalizedEmail, code);
+
         Boolean deleted =
                 redisTemplate.compareAndDelete(
                         codeKey,
-                        code
+                        codeHash
                 );
 
         return Boolean.TRUE.equals(deleted);
@@ -99,5 +119,48 @@ public class VerificationCodeService {
         return email
                 .trim()
                 .toLowerCase(Locale.ROOT);
+    }
+
+    private String hashCode(
+            String normalizedEmail,
+            String code
+    ) {
+
+        try {
+
+            Mac mac =
+                    Mac.getInstance("HmacSHA256");
+
+            SecretKeySpec secretKey =
+                    new SecretKeySpec(
+                            verificationCodeSecret.getBytes(
+                                    StandardCharsets.UTF_8
+                            ),
+                            "HmacSHA256"
+                    );
+
+            mac.init(secretKey);
+
+            String value =
+                    normalizedEmail + ":" + code;
+
+            byte[] hash =
+                    mac.doFinal(
+                            value.getBytes(
+                                    StandardCharsets.UTF_8
+                            )
+                    );
+
+            return HexFormat
+                    .of()
+                    .formatHex(hash);
+
+        } catch (GeneralSecurityException exception) {
+
+            throw new IllegalStateException(
+                    "Could not hash verification code",
+                    exception
+            );
+        }
     }
 }
