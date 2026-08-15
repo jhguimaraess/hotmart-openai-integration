@@ -11,8 +11,8 @@ import java.util.List;
 @Service
 public class PurchaseService {
 
-    private PurchaseRepository purchaseRepository;
-    private UserService userService;
+    private final PurchaseRepository purchaseRepository;
+    private final UserService userService;
 
     public PurchaseService(PurchaseRepository purchaseRepository, UserService userService){
         this.purchaseRepository = purchaseRepository;
