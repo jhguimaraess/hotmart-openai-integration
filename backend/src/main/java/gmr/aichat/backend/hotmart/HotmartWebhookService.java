@@ -105,6 +105,18 @@ public class HotmartWebhookService {
         String transactionId =
                 request.data().purchase().transaction();
 
+        var purchaseOptional =
+                purchaseService.findOptionalByTransactionId(transactionId);
+
+        if (purchaseOptional.isEmpty()) {
+            logger.warn(
+                    "Ignoring refund for unknown transaction: {}",
+                    transactionId
+            );
+
+            return;
+        }
+
         Purchase purchase =
                 purchaseService.updateStatus(
                         transactionId,
@@ -125,6 +137,18 @@ public class HotmartWebhookService {
 
         String transactionId =
                 request.data().purchase().transaction();
+
+        var purchaseOptional =
+                purchaseService.findOptionalByTransactionId(transactionId);
+
+        if (purchaseOptional.isEmpty()) {
+            logger.warn(
+                    "Ignoring chargeback for unknown transaction: {}",
+                    transactionId
+            );
+
+            return;
+        }
 
         Purchase purchase =
                 purchaseService.updateStatus(

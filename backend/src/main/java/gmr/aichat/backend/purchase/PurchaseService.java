@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PurchaseService {
@@ -73,5 +74,12 @@ public class PurchaseService {
                 userId,
                 PurchaseStatus.APPROVED
         );
+    }
+
+    public Optional<Purchase> findOptionalByTransactionId(
+            String hotmartTransactionId
+    ) {
+        return purchaseRepository
+                .findByHotmartTransactionId(hotmartTransactionId);
     }
 }
