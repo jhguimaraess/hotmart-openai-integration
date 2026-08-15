@@ -26,18 +26,25 @@ public class AuthService {
 
     public void requestVerificationCode(String email) {
 
-        User user = userService
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "User not found"
-                        )
-                );
+        var userOptional =
+                userService.findByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            logger.info(
+                    "Verification code request ignored for ineligible user"
+            );
+
+            return;
+        }
+
+        User user = userOptional.get();
 
         if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new IllegalStateException(
-                    "User is not active"
+            logger.info(
+                    "Verification code request ignored for ineligible user"
             );
+
+            return;
         }
 
         verificationCodeService.generateAndStoreCode(

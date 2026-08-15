@@ -1,5 +1,6 @@
 package gmr.aichat.backend.auth;
 
+import gmr.aichat.backend.auth.exception.VerificationCodeCooldownException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -51,9 +52,7 @@ public class VerificationCodeService {
                         );
 
         if (!Boolean.TRUE.equals(cooldownCreated)) {
-            throw new IllegalStateException(
-                    "Verification code requested too recently"
-            );
+            throw new VerificationCodeCooldownException();
         }
 
         String code = generateCode();
