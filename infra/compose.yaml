@@ -42,6 +42,13 @@ services:
       SPRING_MAIL_PORT: 1025
       MAIL_FROM: no-reply@hotmart-ai.local
 
+      JWT_PRIVATE_KEY_LOCATION: file:/run/secrets/jwt-private.pem
+      JWT_PUBLIC_KEY_LOCATION: file:/run/secrets/jwt-public.pem
+
+    volumes:
+      - ./secrets/jwt-private.pem:/run/secrets/jwt-private.pem:ro
+      - ./secrets/jwt-public.pem:/run/secrets/jwt-public.pem:ro
+
     ports:
       - "8080:8080"
 

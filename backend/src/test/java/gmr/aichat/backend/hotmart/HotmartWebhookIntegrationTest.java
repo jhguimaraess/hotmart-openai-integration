@@ -29,7 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         properties = {
                 "hotmart.webhook.hottok=test-hottok",
                 "spring.mail.host=localhost",
-                "spring.mail.port=1025"
+                "spring.mail.port=1025",
+                "jwt.private-key-location=classpath:keys/test-private.pem",
+                "jwt.public-key-location=classpath:keys/test-public.pem"
         }
 )
 @AutoConfigureMockMvc
