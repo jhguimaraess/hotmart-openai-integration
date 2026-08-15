@@ -26,7 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Testcontainers
 @SpringBootTest(
-        properties = "hotmart.webhook.hottok=test-hottok"
+        properties = {
+                "hotmart.webhook.hottok=test-hottok",
+                "spring.mail.host=localhost",
+                "spring.mail.port=1025"
+        }
 )
 @AutoConfigureMockMvc
 class HotmartWebhookIntegrationTest {

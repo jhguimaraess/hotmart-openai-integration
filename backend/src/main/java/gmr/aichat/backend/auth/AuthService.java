@@ -15,13 +15,16 @@ public class AuthService {
 
     private final UserService userService;
     private final VerificationCodeService verificationCodeService;
+    private final EmailService emailService;
 
     public AuthService(
             UserService userService,
-            VerificationCodeService verificationCodeService
+            VerificationCodeService verificationCodeService,
+            EmailService emailService
     ) {
         this.userService = userService;
         this.verificationCodeService = verificationCodeService;
+        this.emailService = emailService;
     }
 
     public void requestVerificationCode(String email) {
@@ -47,8 +50,14 @@ public class AuthService {
             return;
         }
 
-        verificationCodeService.generateAndStoreCode(
-                user.getEmail()
+        String code =
+                verificationCodeService.generateAndStoreCode(
+                        user.getEmail()
+                );
+
+        emailService.sendVerificationCode(
+                user.getEmail(),
+                code
         );
 
         logger.info(

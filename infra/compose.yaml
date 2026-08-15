@@ -31,10 +31,16 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+
       HOTMART_WEBHOOK_HOTTOK: ${HOTMART_WEBHOOK_HOTTOK}
+
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      MAIL_FROM: no-reply@hotmart-ai.local
 
     ports:
       - "8080:8080"
@@ -43,6 +49,8 @@ services:
       database:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      mailpit:
         condition: service_healthy
 
   frontend:
@@ -79,6 +87,19 @@ services:
           "CMD-SHELL",
           "REDISCLI_AUTH=$$REDIS_PASSWORD redis-cli ping | grep PONG",
         ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: hotmart-mailpit
+
+    ports:
+      - "127.0.0.1:8025:8025"
+
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
       interval: 5s
       timeout: 5s
       retries: 10
