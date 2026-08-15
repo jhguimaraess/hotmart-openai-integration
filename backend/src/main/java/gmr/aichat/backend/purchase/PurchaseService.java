@@ -67,4 +67,11 @@ public class PurchaseService {
         return purchaseRepository
                 .existsByHotmartTransactionId(hotmartTransactionId);
     }
+
+    public boolean hasApprovedPurchase(Long userId) {
+        return purchaseRepository.existsByUser_IdAndStatus(
+                userId,
+                PurchaseStatus.APPROVED
+        );
+    }
 }

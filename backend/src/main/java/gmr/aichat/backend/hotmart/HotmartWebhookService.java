@@ -101,19 +101,58 @@ public class HotmartWebhookService {
     private void processPurchaseRefunded(
             HotmartWebhookRequest request
     ) {
+
+        String transactionId =
+                request.data().purchase().transaction();
+
+        Purchase purchase =
+                purchaseService.updateStatus(
+                        transactionId,
+                        PurchaseStatus.REFUNDED
+                );
+
+        updateUserAccess(purchase);
+
         logger.info(
-                "Processing refunded purchase: {}",
-                request.data().purchase().transaction()
+                "Purchase {} refunded",
+                transactionId
         );
     }
 
     private void processPurchaseChargeback(
             HotmartWebhookRequest request
     ) {
+
+        String transactionId =
+                request.data().purchase().transaction();
+
+        Purchase purchase =
+                purchaseService.updateStatus(
+                        transactionId,
+                        PurchaseStatus.CHARGEBACK
+                );
+
+        updateUserAccess(purchase);
+
         logger.info(
-                "Processing chargeback purchase: {}",
-                request.data().purchase().transaction()
+                "Purchase {} marked as chargeback",
+                transactionId
         );
+    }
+
+    private void updateUserAccess(Purchase purchase) {
+
+        Long userId = purchase.getUser().getId();
+
+        boolean hasApprovedPurchase =
+                purchaseService.hasApprovedPurchase(userId);
+
+        if (!hasApprovedPurchase) {
+            userService.updateStatus(
+                    userId,
+                    UserStatus.INACTIVE
+            );
+        }
     }
 
     private Instant resolvePurchaseDate(
