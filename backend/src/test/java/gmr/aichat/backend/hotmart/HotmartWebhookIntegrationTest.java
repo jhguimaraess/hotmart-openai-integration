@@ -14,9 +14,11 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,7 +26,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Testcontainers
 @SpringBootTest(
-        properties = "hotmart.webhook.hottok=test-hottok"
+        properties = {
+                "hotmart.webhook.hottok=test-hottok",
+                "spring.mail.host=localhost",
+                "spring.mail.port=1025",
+                "jwt.private-key-location=classpath:keys/test-private.pem",
+                "jwt.public-key-location=classpath:keys/test-public.pem",
+                "auth.verification-code-secret=test-verification-secret"
+        }
 )
 @AutoConfigureMockMvc
 class HotmartWebhookIntegrationTest {
@@ -33,6 +42,14 @@ class HotmartWebhookIntegrationTest {
     @ServiceConnection
     static PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:17-alpine");
+
+    @Container
+    @ServiceConnection(name = "redis")
+    static GenericContainer<?> redis =
+            new GenericContainer<>(
+                    DockerImageName.parse("redis:8-alpine")
+            )
+                    .withExposedPorts(6379);
 
     @Autowired
     private MockMvc mockMvc;
