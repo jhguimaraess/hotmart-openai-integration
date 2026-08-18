@@ -1,4 +1,4 @@
-function EmailStep({ email, setEmail, onSubmit }) {
+function EmailStep({ email, onEmailChange, onSubmit, isLoading, error }) {
   function handleSubmit(event) {
     event.preventDefault();
 
@@ -22,14 +22,23 @@ function EmailStep({ email, setEmail, onSubmit }) {
               placeholder="yourname@email.com"
               autoComplete="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              disabled={isLoading}
+              onChange={(event) => onEmailChange(event.target.value)}
             />
           </div>
         </div>
 
-        <button type="submit">SEND CODE</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "SENDING..." : "SEND CODE"}
+        </button>
 
-        <p>
+        {error && (
+          <p className="login-form-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <p className="login-form-helper">
           we'll send a verification code
           <br />
           to your email

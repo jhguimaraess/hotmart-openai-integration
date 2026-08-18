@@ -12,16 +12,136 @@ import character880 from "../../assets/login/login-character-880.webp";
 import EmailStep from "../../components/auth/EmailStep";
 import VerificationStep from "../../components/auth/VerificationStep";
 
+import {
+  requestVerificationCode,
+  verifyVerificationCode,
+} from "../../services/authService";
+
+import { useAuth } from "../../context/AuthContext";
+
 function LoginPage() {
+  const { login } = useAuth();
+
   const [step, setStep] = useState("email");
+
   const [email, setEmail] = useState("");
 
-  function handleEmailSubmit() {
-    setStep("verification");
+  const [isRequestingCode, setIsRequestingCode] = useState(false);
+
+  const [requestError, setRequestError] = useState("");
+
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+
+  const [verificationError, setVerificationError] = useState("");
+
+  function handleEmailChange(value) {
+    setEmail(value);
+
+    if (requestError) {
+      setRequestError("");
+    }
+  }
+
+  async function handleEmailSubmit() {
+    const normalizedEmail = email.trim();
+
+    if (!normalizedEmail) {
+      setRequestError("Please enter your email address.");
+      return;
+    }
+
+    if (isRequestingCode) {
+      return;
+    }
+
+    setIsRequestingCode(true);
+    setRequestError("");
+
+    try {
+      await requestVerificationCode(normalizedEmail);
+
+      setEmail(normalizedEmail);
+
+      setStep("verification");
+    } catch (error) {
+      if (error.status === 429) {
+        setRequestError("Please wait before requesting another code.");
+
+        return;
+      }
+
+      if (error.status === 400) {
+        setRequestError("Please enter a valid email address.");
+
+        return;
+      }
+
+      setRequestError(
+        "We couldn't send the verification code. Please try again.",
+      );
+    } finally {
+      setIsRequestingCode(false);
+    }
+  }
+
+  async function handleVerificationSubmit(code) {
+    if (code.length !== 6) {
+      setVerificationError("Please enter the complete 6-digit code.");
+
+      return;
+    }
+
+    if (isVerifyingCode) {
+      return;
+    }
+
+    setIsVerifyingCode(true);
+    setVerificationError("");
+
+    try {
+      const tokenResponse = await verifyVerificationCode(email, code);
+
+      login(tokenResponse);
+
+      console.log("Authentication successful");
+    } catch (error) {
+      if (error.status === 401) {
+        setVerificationError("The verification code is invalid or expired.");
+
+        return;
+      }
+
+      if (error.status === 400) {
+        setVerificationError("Please enter a valid verification code.");
+
+        return;
+      }
+
+      setVerificationError("We couldn't verify the code. Please try again.");
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  }
+
+  async function handleResendCode() {
+    try {
+      await requestVerificationCode(email);
+
+      return true;
+    } catch (error) {
+      if (error.status === 429) {
+        throw new Error("Please wait before requesting another code.");
+      }
+
+      throw new Error(
+        "We couldn't resend the verification code. Please try again.",
+      );
+    }
   }
 
   function handleChangeEmail() {
     setStep("email");
+    setRequestError("");
   }
 
   return (
@@ -54,13 +174,22 @@ function LoginPage() {
           {step === "email" && (
             <EmailStep
               email={email}
-              setEmail={setEmail}
+              onEmailChange={handleEmailChange}
               onSubmit={handleEmailSubmit}
+              isLoading={isRequestingCode}
+              error={requestError}
             />
           )}
 
           {step === "verification" && (
-            <VerificationStep email={email} onChangeEmail={handleChangeEmail} />
+            <VerificationStep
+              email={email}
+              onChangeEmail={handleChangeEmail}
+              onVerify={handleVerificationSubmit}
+              onResend={handleResendCode}
+              isLoading={isVerifyingCode}
+              error={verificationError}
+            />
           )}
         </section>
       </div>
