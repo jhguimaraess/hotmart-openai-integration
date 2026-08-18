@@ -186,6 +186,203 @@
   line-height: 1.35;
 }
 
+.verification-wrapper {
+  width: 100%;
+  max-width: 414px;
+}
+
+.verification-header h1 {
+  margin: 0 0 26px;
+
+  text-align: center;
+
+  color: #244b76;
+
+  font-size: clamp(2.15rem, 2.8vw, 2.65rem);
+
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.verification-header p {
+  margin: 0;
+
+  color: #737373;
+
+  font-size: 1rem;
+  line-height: 1.35;
+
+  font-weight: 500;
+}
+
+.verification-email {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 4px;
+
+  margin: 34px 0 52px;
+
+  color: #505050;
+
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.verification-email-link {
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #337cc2;
+
+  font: inherit;
+  font-weight: 500;
+
+  text-decoration: underline;
+
+  cursor: pointer;
+}
+
+.verification-email-link:hover {
+  color: #245f98;
+}
+
+.verification-email-copied {
+  margin-left: 6px;
+
+  color: #7e98b5;
+
+  font-size: 0.8rem;
+}
+
+.verification-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.verification-field label {
+  display: block;
+
+  margin-bottom: 24px;
+
+  color: #244b76;
+
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.verification-inputs {
+  display: grid;
+
+  grid-template-columns: repeat(6, 1fr);
+
+  gap: 18px;
+}
+
+.verification-inputs input {
+  width: 100%;
+  aspect-ratio: 1 / 1.15;
+
+  padding: 0;
+
+  border: 2px solid #7fa5cf;
+
+  border-radius: 10px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #244b76;
+
+  text-align: center;
+
+  font-size: 1.45rem;
+  font-weight: 600;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.verification-inputs input:focus {
+  border-color: #3f6997;
+
+  box-shadow: 0 0 0 3px rgba(63, 105, 151, 0.1);
+}
+
+.verification-button {
+  height: 60px;
+
+  margin-top: 50px;
+
+  border: 0;
+  border-radius: 999px;
+
+  background: #dbeafb;
+
+  color: #3f6997;
+
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12);
+
+  font-size: 1.2rem;
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  cursor: pointer;
+}
+
+.verification-change-email {
+  margin-top: 32px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #337cc2;
+
+  font-size: 1rem;
+
+  text-decoration: underline;
+
+  cursor: pointer;
+}
+
+.verification-resend {
+  margin-top: 24px;
+
+  color: #9b9b9b;
+
+  font-size: 0.95rem;
+}
+
+.verification-resend button {
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #337cc2;
+
+  font: inherit;
+
+  text-decoration: underline;
+
+  cursor: pointer;
+}
+
+.verification-resend button:hover {
+  color: #245f98;
+}
+
 @media (max-width: 1100px) {
   .login-layout {
     grid-template-columns: 410px 1fr;
@@ -253,6 +450,41 @@
   .login-form p {
     font-size: 0.85rem;
   }
+
+  .verification-wrapper {
+    max-width: 360px;
+  }
+
+  .verification-header h1 {
+    font-size: 2.15rem;
+  }
+
+  .verification-header p,
+  .verification-email {
+    font-size: 0.9rem;
+  }
+
+  .verification-email {
+    margin: 28px 0 40px;
+  }
+
+  .verification-field label {
+    margin-bottom: 20px;
+
+    font-size: 1rem;
+  }
+
+  .verification-inputs {
+    gap: 12px;
+  }
+
+  .verification-button {
+    height: 54px;
+
+    margin-top: 40px;
+
+    font-size: 1.05rem;
+  }
 }
 
 @media (max-width: 880px) {
@@ -314,8 +546,6 @@
     transform: translateX(-50%);
   }
 
-  /* FORM */
-
   .login-content {
     display: block;
 
@@ -361,6 +591,73 @@
 
   .login-form p {
     margin-top: -16px;
+
+    font-size: 0.8rem;
+  }
+
+  .verification-wrapper {
+    width: 100%;
+    max-width: none;
+  }
+
+  .verification-header h1 {
+    margin-bottom: 22px;
+
+    font-size: 1.55rem;
+  }
+
+  .verification-header p {
+    text-align: center;
+
+    font-size: 0.85rem;
+  }
+
+  .verification-email {
+    justify-content: center;
+
+    margin: 24px 0 36px;
+
+    text-align: center;
+
+    font-size: 0.85rem;
+  }
+
+  .verification-field label {
+    margin-bottom: 20px;
+
+    font-size: 0.9rem;
+  }
+
+  .verification-inputs {
+    gap: 8px;
+  }
+
+  .verification-inputs input {
+    border-radius: 8px;
+
+    font-size: 1.15rem;
+  }
+
+  .verification-button {
+    height: 45px;
+
+    margin-top: 36px;
+
+    font-size: 0.95rem;
+  }
+
+  .verification-change-email {
+    display: block;
+
+    margin: 24px auto 0;
+
+    font-size: 0.85rem;
+  }
+
+  .verification-resend {
+    margin-top: 18px;
+
+    text-align: center;
 
     font-size: 0.8rem;
   }

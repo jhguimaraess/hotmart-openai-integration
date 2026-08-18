@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import "./LoginPage.css";
 
 import logo from "../../assets/logo.svg";
@@ -7,7 +9,21 @@ import character440 from "../../assets/login/login-character-440.webp";
 import character500 from "../../assets/login/login-character-500.webp";
 import character880 from "../../assets/login/login-character-880.webp";
 
+import EmailStep from "../../components/auth/EmailStep";
+import VerificationStep from "../../components/auth/VerificationStep";
+
 function LoginPage() {
+  const [step, setStep] = useState("email");
+  const [email, setEmail] = useState("");
+
+  function handleEmailSubmit() {
+    setStep("verification");
+  }
+
+  function handleChangeEmail() {
+    setStep("email");
+  }
+
   return (
     <main className="login-page">
       <div className="login-layout container">
@@ -35,34 +51,17 @@ function LoginPage() {
         </section>
 
         <section className="login-content">
-          <div className="login-form-wrapper">
-            <h1>Welcome Back</h1>
+          {step === "email" && (
+            <EmailStep
+              email={email}
+              setEmail={setEmail}
+              onSubmit={handleEmailSubmit}
+            />
+          )}
 
-            <form className="login-form">
-              <div className="login-field">
-                <label htmlFor="email">Email</label>
-
-                <div className="login-input-wrapper">
-                  <span aria-hidden="true">✉</span>
-
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="yourname@email.com"
-                    autoComplete="email"
-                  />
-                </div>
-              </div>
-
-              <button type="submit">SEND CODE</button>
-
-              <p>
-                we'll send a verification code
-                <br />
-                to your email
-              </p>
-            </form>
-          </div>
+          {step === "verification" && (
+            <VerificationStep email={email} onChangeEmail={handleChangeEmail} />
+          )}
         </section>
       </div>
     </main>
