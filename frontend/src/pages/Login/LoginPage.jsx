@@ -123,6 +123,22 @@ function LoginPage() {
     }
   }
 
+  async function handleResendCode() {
+    try {
+      await requestVerificationCode(email);
+
+      return true;
+    } catch (error) {
+      if (error.status === 429) {
+        throw new Error("Please wait before requesting another code.");
+      }
+
+      throw new Error(
+        "We couldn't resend the verification code. Please try again.",
+      );
+    }
+  }
+
   function handleChangeEmail() {
     setStep("email");
     setRequestError("");
@@ -170,6 +186,7 @@ function LoginPage() {
               email={email}
               onChangeEmail={handleChangeEmail}
               onVerify={handleVerificationSubmit}
+              onResend={handleResendCode}
               isLoading={isVerifyingCode}
               error={verificationError}
             />

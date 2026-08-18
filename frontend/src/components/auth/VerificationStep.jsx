@@ -4,6 +4,7 @@ function VerificationStep({
   email,
   onChangeEmail,
   onVerify,
+  onResend,
   isLoading,
   error,
 }) {
@@ -11,7 +12,11 @@ function VerificationStep({
 
   const inputsRef = useRef([]);
 
-  const [resendSeconds, setResendSeconds] = useState(42);
+  const [resendSeconds, setResendSeconds] = useState(60);
+
+  const [isResending, setIsResending] = useState(false);
+
+  const [resendError, setResendError] = useState("");
 
   const [emailCopied, setEmailCopied] = useState(false);
 
@@ -81,6 +86,14 @@ function VerificationStep({
     inputsRef.current[lastIndex]?.focus();
   }
 
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    const verificationCode = code.join("");
+
+    onVerify(verificationCode);
+  }
+
   async function handleCopyEmail() {
     try {
       await navigator.clipboard.writeText(email);
@@ -95,19 +108,23 @@ function VerificationStep({
     }
   }
 
-  function handleResendCode() {
-    if (resendSeconds > 0) {
+  async function handleResendCode() {
+    if (resendSeconds > 0 || isResending) {
       return;
     }
-    setResendSeconds(60);
-  }
 
-  function handleSubmit(event) {
-    event.preventDefault();
+    setIsResending(true);
+    setResendError("");
 
-    const verificationCode = code.join("");
+    try {
+      await onResend();
 
-    onVerify(verificationCode);
+      setResendSeconds(60);
+    } catch (error) {
+      setResendError(error.message);
+    } finally {
+      setIsResending(false);
+    }
   }
 
   return (
@@ -170,6 +187,7 @@ function VerificationStep({
         >
           {isLoading ? "VERIFYING..." : "VERIFY CODE"}
         </button>
+
         {error && (
           <p className="verification-error" role="alert">
             {error}
@@ -189,11 +207,21 @@ function VerificationStep({
         {resendSeconds > 0 ? (
           <span>Resend code in {resendSeconds}s</span>
         ) : (
-          <button type="button" onClick={handleResendCode}>
-            Resend code
+          <button
+            type="button"
+            onClick={handleResendCode}
+            disabled={isResending}
+          >
+            {isResending ? "Resending..." : "Resend code"}
           </button>
         )}
       </div>
+
+      {resendError && (
+        <p className="verification-resend-error" role="alert">
+          {resendError}
+        </p>
+      )}
     </div>
   );
 }
