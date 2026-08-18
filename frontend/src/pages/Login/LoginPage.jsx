@@ -17,9 +17,11 @@ import {
   verifyVerificationCode,
 } from "../../services/authService";
 
-import { saveAuth } from "../../services/authStorage";
+import { useAuth } from "../../context/AuthContext";
 
 function LoginPage() {
+  const { login } = useAuth();
+
   const [step, setStep] = useState("email");
 
   const [email, setEmail] = useState("");
@@ -99,7 +101,7 @@ function LoginPage() {
     try {
       const tokenResponse = await verifyVerificationCode(email, code);
 
-      saveAuth(tokenResponse);
+      login(tokenResponse);
 
       console.log("Authentication successful");
     } catch (error) {

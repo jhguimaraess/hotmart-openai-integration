@@ -1,6 +1,13 @@
+import { getAuth, removeAuth } from "./authStorage";
+
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 
-export async function apiRequest(path, { body, headers, ...options } = {}) {
+export async function apiRequest(
+  path,
+  { body, headers, requiresAuth = true, ...options } = {},
+) {
+  const auth = requiresAuth ? getAuth() : null;
+
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
 
@@ -8,6 +15,12 @@ export async function apiRequest(path, { body, headers, ...options } = {}) {
       ...(body
         ? {
             "Content-Type": "application/json",
+          }
+        : {}),
+
+      ...(auth?.accessToken
+        ? {
+            Authorization: `${auth.tokenType ?? "Bearer"} ${auth.accessToken}`,
           }
         : {}),
 
@@ -32,6 +45,12 @@ export async function apiRequest(path, { body, headers, ...options } = {}) {
   }
 
   if (!response.ok) {
+    if (response.status === 401 && requiresAuth) {
+      removeAuth();
+
+      window.dispatchEvent(new Event("auth:unauthorized"));
+    }
+
     const error = new Error(data?.message ?? "Something went wrong");
 
     error.status = response.status;

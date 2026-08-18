@@ -22,10 +22,16 @@ export function getAuth() {
   }
 
   try {
-    return JSON.parse(storedAuth);
-  } catch {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    const auth = JSON.parse(storedAuth);
 
+    if (!auth.accessToken || !auth.expiresAt || auth.expiresAt <= Date.now()) {
+      removeAuth();
+      return null;
+    }
+
+    return auth;
+  } catch {
+    removeAuth();
     return null;
   }
 }
