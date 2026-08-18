@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-function VerificationStep({ email, onChangeEmail }) {
+function VerificationStep({
+  email,
+  onChangeEmail,
+  onVerify,
+  isLoading,
+  error,
+}) {
   const [code, setCode] = useState(Array(6).fill(""));
 
   const inputsRef = useRef([]);
@@ -101,7 +107,7 @@ function VerificationStep({ email, onChangeEmail }) {
 
     const verificationCode = code.join("");
 
-    console.log(verificationCode);
+    onVerify(verificationCode);
   }
 
   return (
@@ -157,9 +163,18 @@ function VerificationStep({ email, onChangeEmail }) {
           </div>
         </div>
 
-        <button className="verification-button" type="submit">
-          VERIFY CODE
+        <button
+          className="verification-button"
+          type="submit"
+          disabled={isLoading}
+        >
+          {isLoading ? "VERIFYING..." : "VERIFY CODE"}
         </button>
+        {error && (
+          <p className="verification-error" role="alert">
+            {error}
+          </p>
+        )}
       </form>
 
       <button

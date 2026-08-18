@@ -12,7 +12,12 @@ import character880 from "../../assets/login/login-character-880.webp";
 import EmailStep from "../../components/auth/EmailStep";
 import VerificationStep from "../../components/auth/VerificationStep";
 
-import { requestVerificationCode } from "../../services/authService";
+import {
+  requestVerificationCode,
+  verifyVerificationCode,
+} from "../../services/authService";
+
+import { saveAuth } from "../../services/authStorage";
 
 function LoginPage() {
   const [step, setStep] = useState("email");
@@ -22,6 +27,10 @@ function LoginPage() {
   const [isRequestingCode, setIsRequestingCode] = useState(false);
 
   const [requestError, setRequestError] = useState("");
+
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+
+  const [verificationError, setVerificationError] = useState("");
 
   function handleEmailChange(value) {
     setEmail(value);
@@ -73,6 +82,45 @@ function LoginPage() {
     }
   }
 
+  async function handleVerificationSubmit(code) {
+    if (code.length !== 6) {
+      setVerificationError("Please enter the complete 6-digit code.");
+
+      return;
+    }
+
+    if (isVerifyingCode) {
+      return;
+    }
+
+    setIsVerifyingCode(true);
+    setVerificationError("");
+
+    try {
+      const tokenResponse = await verifyVerificationCode(email, code);
+
+      saveAuth(tokenResponse);
+
+      console.log("Authentication successful");
+    } catch (error) {
+      if (error.status === 401) {
+        setVerificationError("The verification code is invalid or expired.");
+
+        return;
+      }
+
+      if (error.status === 400) {
+        setVerificationError("Please enter a valid verification code.");
+
+        return;
+      }
+
+      setVerificationError("We couldn't verify the code. Please try again.");
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  }
+
   function handleChangeEmail() {
     setStep("email");
     setRequestError("");
@@ -116,7 +164,13 @@ function LoginPage() {
           )}
 
           {step === "verification" && (
-            <VerificationStep email={email} onChangeEmail={handleChangeEmail} />
+            <VerificationStep
+              email={email}
+              onChangeEmail={handleChangeEmail}
+              onVerify={handleVerificationSubmit}
+              isLoading={isVerifyingCode}
+              error={verificationError}
+            />
           )}
         </section>
       </div>
